@@ -12,7 +12,18 @@ module.exports = {
         "gradient-conic":
           "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
       },
+      transform: {
+        'custom-matrix': 'matrix(0.92, 0.49, -0.92, 0.49, 0, 0)',
+      },
     },
   },
-  plugins: [],
+  plugins: [
+    function ({ addUtilities }) {
+      addUtilities({
+        '.transform-custom-matrix': {
+          transform: 'matrix(0.92, 0.49, -0.92, 0.49, 0, 0)',
+        },
+      });
+    },
+  ],
 };
