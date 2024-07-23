@@ -1,4 +1,5 @@
 import { Field } from "@/models/Fields";
+import { Werehouse } from "@/models/Werehouse";
 import connect from "@/utils/db";
 
 export const GET = async (req) => {
@@ -48,20 +49,43 @@ export const POST = async (req) => {
       });
     }
 
-    if(type==='plant'){
-
-      
+    if (type === "plant") {
       field.crop = cropId;
       field.status = "grow";
-    }
-    else if(type==='harvest'){
+    } else if (type === "harvest") {
       field.status = "empty";
-      field.tapsOnField = 0
+      field.tapsOnField = 0;
       field.crop = null;
     }
 
     // Сохраняем изменения
     await userFields.save();
+
+    if (type === "harvest") {
+      const userWerehouse = await Werehouse.findOne({ userId });
+
+      if (!userWerehouse) {
+        return new Response(
+          JSON.stringify({ message: "User werehouse not found" }),
+          { status: 404 }
+        );
+      }
+
+      const siloItem = userWerehouse.silo.find((item) =>
+        item.crop.equals(cropId)
+      );
+
+      if (siloItem) {
+        // Если элемент существует, обновляем его количество
+        siloItem.amount += 1;
+      } else {
+        // Если элемент не существует, добавляем его в массив
+        userWerehouse.silo.push({ crop: cropId, amount: 1 });
+      }
+
+      // Сохраняем изменения в складе
+      await userWerehouse.save();
+    }
 
     return new Response(
       JSON.stringify({ message: "Field updated successfully", field }),
@@ -86,7 +110,7 @@ export const PUT = async (req) => {
     await connect();
 
     // Находим запись по userId
-    const userFields = await Field.findOne({ userId }).populate("fields.crop")
+    const userFields = await Field.findOne({ userId }).populate("fields.crop");
 
     if (!userFields) {
       return new Response(

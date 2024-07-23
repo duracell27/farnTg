@@ -45,7 +45,7 @@ export default function Home() {
       getUserFields(data.user.id);
       getCrops();
     }
-  }, [data]);
+  }, [data?.user?.id]);
 
   return (
     <>
@@ -53,7 +53,7 @@ export default function Home() {
         {/* fields */}
         {fields &&
           fields.map((field) => (
-            <div className="">
+            <div key={field._id} className="">
               {field.status === "empty" && (
                 <div
                   onClick={() => {
@@ -129,7 +129,7 @@ export default function Home() {
         >
           {crops &&
             crops.map((crop) => (
-              <div className="flex items-center gap-3 border border-black mb-1">
+              <div key={crop._id} className="flex items-center gap-3 border border-black mb-1">
                 <div className="">
                   <Image src={`/img/crops/${crop.img}`} width={60} height={60} alt="Crop" />
                 </div>

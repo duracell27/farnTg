@@ -1,5 +1,6 @@
 import { Field } from "@/models/Fields";
 import { User } from "@/models/User";
+import { Werehouse } from "@/models/Werehouse";
 import connect from "@/utils/db";
 import bcrypt from "bcryptjs";
 
@@ -20,6 +21,8 @@ export const POST = async (req) => {
 
     const userField = new Field({userId: newUser._id, fields: [firstField]});
     await userField.save();
+    const userWerehouse = new Werehouse({userId: newUser._id, silo: []})
+    await userWerehouse.save();
 
     return new Response(
       JSON.stringify({ message: "User registered successfully" }),

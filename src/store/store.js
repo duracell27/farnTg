@@ -52,18 +52,22 @@ export const useFields = create((set) => ({
   }
 }));
 // // Хранилище склада
-// export const useWerehouse = create((set) => ({
-//   silo: [
-//     { id: 1, crop: { name: 'Пшениця', img: 'Wheat.webp' }, amount: 0 },
-//     { id: 2, crop: { name: 'Кукурудза', img: 'Corn.webp' }, amount: 0 },
-//   ],
+export const useWerehouse = create((set) => ({
+  silo: null,
 
-//   updateSilo: (cropName, amount) => set((state) => ({
-//     silo: state.silo.map((item) =>
-//       item.crop.name === cropName ? { ...item, amount: item.amount + amount } : item
-//     ),
-//   }))
-// }))
+  getUserSilo: async (userId) => {
+    try {
+      const response = await axios.get("/api/werehouse", {
+        params: { userId },
+      });
+      if (response.status === 200) {
+        set({ silo: response.data.silo });
+      }
+    } catch (error) {
+      console.error("Failed to fetch user werehouse:", error);
+    }
+  },
+}))
 
 // культури
 export const useCrops = create((set) => ({

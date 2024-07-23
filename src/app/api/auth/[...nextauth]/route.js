@@ -5,6 +5,7 @@ import connect from "@/utils/db";
 import { User } from "@/models/User";
 import bcrypt from "bcryptjs";
 import { Field } from "@/models/Fields";
+import { Werehouse } from "@/models/Werehouse";
 
 const handler = NextAuth({
   providers: [
@@ -59,7 +60,7 @@ const handler = NextAuth({
             isGoogleAccount: account.provider === "google" ? true : false,
           });
 
-          await newUser.save()
+          await newUser.save();
 
           //first field creation
           const firstField = { crop: null, tapsOnField: 0, status: "empty" };
@@ -69,6 +70,11 @@ const handler = NextAuth({
             fields: [firstField],
           });
           await userField.save();
+          const userWerehouse = new Werehouse({
+            userId: newUser._id,
+            silo: [],
+          });
+          await userWerehouse.save();
         }
 
         return true;
