@@ -1,36 +1,81 @@
-import { create } from 'zustand'
+import axios from "axios";
+import { create } from "zustand";
 
+// Хранилище полей
 export const useFields = create((set) => ({
   taps: 0,
-  fields: [
-    { id: 1, crop: null, growtaps: 0 },
-  ],
+  fields: null,
+  getUserFields: async (userId) => {
+    try {
+      const response = await axios.get("/api/fields", {
+        params: { userId },
+      });
+      if (response.status === 200) {
+        set({ fields: response.data.fields });
+      }
+    } catch (error) {
+      console.error("Failed to fetch user fields:", error);
+    }
+  },
+  plantField: async (cropId, fieldId, userId, type) => {
+    try {
+      const response = await axios.post("/api/fields", {
+        userId,
+        cropId,
+        fieldId,
+        type
+      });
+    } catch (error) {
+      console.error("Failed to fetch user fields:", error);
+    }
+  },
+  harvestField: async (cropId, fieldId, userId, type) => {
+    try {
+      const response = await axios.post("/api/fields", {
+        userId,
+        cropId,
+        fieldId,
+        type
+      });
+    } catch (error) {
+      console.error("Failed to fetch user fields:", error);
+    }
+  },
+  updateField: async (fieldId, userId, amount) => {
+    try {
+      const response = await axios.put(`/api/fields/`, {
+        fieldId, userId, amount
+      });
+    } catch (error) {
+      console.error("Failed to update field:", error);
+    }
+  }
+}));
+// // Хранилище склада
+// export const useWerehouse = create((set) => ({
+//   silo: [
+//     { id: 1, crop: { name: 'Пшениця', img: 'Wheat.webp' }, amount: 0 },
+//     { id: 2, crop: { name: 'Кукурудза', img: 'Corn.webp' }, amount: 0 },
+//   ],
 
-  updateTaps: (amount) => set((state) => ({taps: state.taps + amount})),
+//   updateSilo: (cropName, amount) => set((state) => ({
+//     silo: state.silo.map((item) =>
+//       item.crop.name === cropName ? { ...item, amount: item.amount + amount } : item
+//     ),
+//   }))
+// }))
 
-  plantCrop: (fieldId, crop) => set((state) => ({
-    fields: state.fields.map((field) =>
-      field.id === fieldId? {...field, crop: crop } : field
-    ),
-  })),
-
-  harvestCrop: (fieldId) => set((state) =>({
-    fields: state.fields.map((field) =>
-      field.id === fieldId? {...field, crop: null, growtaps: 0 } : field
-    ),
-  })),
-
-  updateFieldTaps: (fielId,amount) => set((state) => ({
-    fields: state.fields.map((field) =>
-      field.id === fielId? {...field, growtaps: field.growtaps + amount } : field
-    ),
-
-  }))
-}))
-
+// культури
 export const useCrops = create((set) => ({
-    crops: [
-        {id: 1, name: 'Пшениця', img: 'Wheat.webp', tapsToGrow: 20},
-        {id: 2, name: 'Кукурудза', img: 'Corn.webp', tapsToGrow: 50}
-    ]
-}))
+  crops: null,
+  getCrops: async () => {
+    try {
+      const response = await axios.get("/api/crops");
+      if (response.status === 200) {
+        set({ crops: response.data });
+      }
+    } catch (error) {
+      console.error("Failed to fetch user fields:", error);
+    }
+  },
+}));

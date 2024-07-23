@@ -4,6 +4,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import connect from "@/utils/db";
 import { User } from "@/models/User";
 import bcrypt from "bcryptjs";
+import { Field } from "@/models/Fields";
 
 const handler = NextAuth({
   providers: [
@@ -40,22 +41,34 @@ const handler = NextAuth({
   ],
   callbacks: {
     async session({ session }) {
+      const sessionUser = await User.findOne({ email: session.user.email });
+      if (sessionUser) {
+        session.user.id = sessionUser._id;
+      }
       return session;
     },
     async signIn({ profile, account }) {
-    //   console.log("profile", profile);
-    //   console.log("account", account);
-      
       try {
         await connect();
         const existUser = await User.findOne({ email: profile.email });
         if (!existUser) {
-          const newUser = await User.create({
+          const newUser = new User({
             name: profile.name,
             email: profile.email,
             image: profile.picture,
-            isGoogleAccount: account.provider === 'google' ? true : false,
+            isGoogleAccount: account.provider === "google" ? true : false,
           });
+
+          await newUser.save()
+
+          //first field creation
+          const firstField = { crop: null, tapsOnField: 0, status: "empty" };
+
+          const userField = new Field({
+            userId: newUser._id,
+            fields: [firstField],
+          });
+          await userField.save();
         }
 
         return true;
