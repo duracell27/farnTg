@@ -83,3 +83,31 @@ export const useCrops = create((set) => ({
     }
   },
 }));
+
+// Доступні будинки
+export const useProductionBuildings = create((set) => ({
+  buildings: null,
+  userBuildings: null,
+  getBuildings: async () => {
+    try {
+      const response = await axios.get("/api/productionBuildings");
+      if (response.status === 200) {
+        set({ buildings: response.data });
+      }
+    } catch (error) {
+      console.error("Failed to fetch user fields:", error);
+    }
+  },
+  getUserBuildings: async (userId) => {
+    try {
+      const response = await axios.get("/api/production", {
+        params: { userId },
+      });
+      if (response.status === 200) {
+        set({ userBuildings: response.data.buildings });
+      }
+    } catch (error) {
+      console.error("Failed to fetch user fields:", error);
+    }
+  },
+}));
