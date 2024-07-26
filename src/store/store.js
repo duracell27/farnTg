@@ -84,10 +84,11 @@ export const useCrops = create((set) => ({
   },
 }));
 
-// Доступні будинки
+// Виробництва
 export const useProductionBuildings = create((set) => ({
   buildings: null,
   userBuildings: null,
+  productsForBuilding: null,
   getBuildings: async () => {
     try {
       const response = await axios.get("/api/productionBuildings");
@@ -104,7 +105,31 @@ export const useProductionBuildings = create((set) => ({
         params: { userId },
       });
       if (response.status === 200) {
-        set({ userBuildings: response.data.buildings });
+        set({ userBuildings: response.data });
+      }
+    } catch (error) {
+      console.error("Failed to fetch user fields:", error);
+    }
+  },
+  getProductsForBuilding: async (type) => {
+    try {
+      const response = await axios.get("/api/production/forbuilding", {
+        params: { type },
+      });
+      if (response.status === 200) {
+        set({ productsForBuilding: response.data });
+      }
+    } catch (error) {
+      console.error("Failed to fetch user fields:", error);
+    }
+  },
+  buildBuilding: async (userId,type) => {
+    try {
+      const response = await axios.post("/api/production", {
+        userId, type
+      });
+      if (response.status === 200) {
+        set({ message: 'Успішно побудовано' });
       }
     } catch (error) {
       console.error("Failed to fetch user fields:", error);

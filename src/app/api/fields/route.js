@@ -126,13 +126,12 @@ export const PUT = async (req) => {
         status: 404,
       });
     }
-    console.log("onField", field.tapsOnField);
-    console.log("oncrop", field.crop.tapsToGrow);
+    
     if (field.tapsOnField < field.crop.tapsToGrow) {
-      console.log("+1");
+      
       field.tapsOnField += amount;
     } else {
-      console.log("from ready");
+      
       field.status = "ready";
     }
 

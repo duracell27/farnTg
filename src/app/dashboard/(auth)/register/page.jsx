@@ -25,7 +25,6 @@ const Register = () => {
       setErr(true)
     }
 
-    console.log('form submitted')
   }
 
   return (

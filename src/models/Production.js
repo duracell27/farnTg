@@ -7,10 +7,17 @@ const ProductionSchema = new Schema(
       ref: "User",
       required: true,
     },
-    buildings: [{
-      type: Schema.Types.ObjectId,
-      ref: "ProductionBuildings",
-    }],
+    building: {
+      name: {
+        type: String,
+        required: true,
+      },
+      img: { type: String, required: true },
+      slots: [{type: Schema.Types.ObjectId, ref: "Product"}],
+      type: {type: String,  enum: ['bakery', 'FeedMill'], required: true},
+      price: { type: Number, required: true},
+      lvl: {type: Number, required: true}
+    },
   },
   {
     timestamps: true,

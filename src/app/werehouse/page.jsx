@@ -15,8 +15,6 @@ const Werehouse = () => {
     }
   }, [data?.user?.id]);
 
-  console.log("silo", silo);
-
   return (
     <div className="bg-[#87cefa] grow">
       <div className="">

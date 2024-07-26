@@ -8,7 +8,7 @@ export const POST = async (req) => {
   const body = await req.json();
   const { name, email, password } = body;
 
-  //   console.log(name, email, password);
+  
 
   try {
     await connect();
