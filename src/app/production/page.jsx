@@ -10,12 +10,24 @@ const Production = () => {
 
   const buildings = useProductionBuildings((state) => state.buildings);
   const userBuildings = useProductionBuildings((state) => state.userBuildings);
-  const productsForBuilding = useProductionBuildings((state) => state.productsForBuilding)
+  const productsForBuilding = useProductionBuildings(
+    (state) => state.productsForBuilding
+  );
 
-  const getUserBuildings = useProductionBuildings( (state) => state.getUserBuildings);
+  const getUserBuildings = useProductionBuildings(
+    (state) => state.getUserBuildings
+  );
   const getBuildings = useProductionBuildings((state) => state.getBuildings);
-  const buildBuilding = useProductionBuildings((state)=> state.buildBuilding);
-  const getProductsForBuilding = useProductionBuildings((state) => state.getProductsForBuilding);
+  const buildBuilding = useProductionBuildings((state) => state.buildBuilding);
+  const getProductsForBuilding = useProductionBuildings(
+    (state) => state.getProductsForBuilding
+  );
+  const chooseProductToProduce = useProductionBuildings(
+    (state) => state.chooseProductToProduce
+  );
+  const updateSlotTaps = useProductionBuildings(
+    (state) => state.updateSlotTaps
+  );
 
   useEffect(() => {
     if (data) {
@@ -50,7 +62,10 @@ const Production = () => {
                 <p>Потрібний рівень: {building.lvl}</p>
                 <p>Ціна: {building.price}</p>
               </div>
-              <span onClick={()=>buildBuilding(data.user.id, building.type)} className="bg-green-400 text-black px-1 rounded-lg p-1 left-[35px] bottom-0 text-sm">
+              <span
+                onClick={() => buildBuilding(data.user.id, building.type)}
+                className="bg-green-400 text-black px-1 rounded-lg p-1 left-[35px] bottom-0 text-sm"
+              >
                 Купити
               </span>
             </div>
@@ -73,58 +88,159 @@ const Production = () => {
                   alt="production"
                 />
               </div>
-              <div className="">
+              <div className="grow">
                 <p>
                   <strong>{building?.building?.name}</strong>
                 </p>
-                <p>Виробити: </p>
-                <div className="size-16 bg-[#ca803f] flex justify-center items-center">
-                  <span onClick={()=>{setBuildingPopup(true);getProductsForBuilding(building.building.type)}} className="text-2xl">+</span>
-                </div>
+                {/* <p>Виробити: </p> */}
+
+                {building.building.slots.length > 0 &&
+                  building.building.slots.map((slot, index) => {
+                    {
+                      slot.slotStatus === "emty" && (
+                        <div className="size-16 bg-[#ca803f] flex justify-center items-center">
+                          <span
+                            onClick={() => {
+                              setBuildingPopup(true);
+                              getProductsForBuilding(building.building.type);
+                            }}
+                            className="text-2xl p-10 cursor-pointer"
+                          >
+                            +
+                          </span>
+                        </div>
+                      );
+                    }
+
+                    {
+                      slot.slotStatus === "production" && (
+                        <div className="flex gap-3 items-center w-full">
+                          <Image
+                            src={`/img/product/${slot.product.img}`}
+                            width={60}
+                            height={60}
+                            alt="production"
+                          />
+                          <span className="bg-green-400 text-black px-1 rounded-lg">
+                            {slot.tapsOnProduct} / {slot.product.tapsToProduce}
+                          </span>
+                          <button
+                            onClick={() => updateSlotTaps(data.user.id, index)}
+                            className="p-5 bg-green-400 grow mr-2 rounded-xl"
+                          >
+                            Виробляти
+                          </button>
+                        </div>
+                      );
+                    }
+
+                    {
+                      slot.slotStatus === "ready" && (
+                        <div className="flex gap-3 items-center w-full">
+                          <Image
+                            src={`/img/product/${slot.product.img}`}
+                            width={60}
+                            height={60}
+                            alt="production"
+                          />
+                          <span className="bg-green-400 text-black px-1 rounded-lg">
+                            {slot.tapsOnProduct} / {slot.product.tapsToProduce}
+                          </span>
+                          <button
+                            className="p-5 bg-green-400 grow mr-2 rounded-xl"
+                          >
+                            Відправити на склад
+                          </button>
+                        </div>
+                      );
+                    }
+
+
+                  })}
+
+                {/* {building.building.slots.length &&
+                  building.building.slots.map((product, index) => (
+                    <div className="flex gap-3 items-center w-full">
+                      <Image
+                        src={`/img/product/${product.product.img}`}
+                        width={60}
+                        height={60}
+                        alt="production"
+                      />
+                      <span className="bg-green-400 text-black px-1 rounded-lg">
+                        {product.tapsOnProduct} /{" "}
+                        {product.product.tapsToProduce}
+                      </span>
+                      <button
+                        onClick={() => updateSlotTaps(data.user.id, index)}
+                        className="p-5 bg-green-400 grow mr-2 rounded-xl"
+                      >
+                        Виробляти
+                      </button>
+                    </div>
+                  ))} */}
               </div>
-              
             </div>
           ))}
       </div>
 
       {buildingPopup && (
-          <div
-            className="fixed inset-0 bg-black bg-opacity-50"
-            onClick={() => {
-              setBuildingPopup(false)
-              
-            }}
-          ></div>
-        )}
-
-        {/* Popup container */}
         <div
-          className={`fixed min-w-[320px] w-full mx-auto bottom-0 left-0 right-0 bg-slate-500 border-t border-gray-300 transition-transform transform ${
-            buildingPopup ? "translate-y-0" : "translate-y-full"
-          } h-3/4 overflow-y-auto`}
-        >
-          {productsForBuilding &&
-            productsForBuilding.map((product) => (
-              <div key={product._id} className="flex items-center gap-3 border border-black mb-1">
-                <div className="">
-                  <Image src={`/img/product/${product.img}`} width={40} height={40} alt="product" />
-                </div>
-                <span> = </span>
-                <div className="">
-                {product.needs.map((productNeed) => (
-                  <div className="flex items-center">
-                  <Image src={`/img/crops/${productNeed.crop.img}`} width={40} height={40} alt="product"/>
-                   x {productNeed.amount}</div>
-                ))}
-                </div>
-                <span> + </span>
-                <div className="">
-                  {product.tapsToProduce} Тапів
-                </div>
-                <div className="bg-green-400 text-black text-sm p-1 rounded-lg">Виготовити</div>
+          className="fixed inset-0 bg-black bg-opacity-50"
+          onClick={() => {
+            setBuildingPopup(false);
+          }}
+        ></div>
+      )}
+
+      {/* Popup container */}
+      <div
+        className={`fixed min-w-[320px] w-full mx-auto bottom-0 left-0 right-0 bg-slate-500 border-t border-gray-300 transition-transform transform ${
+          buildingPopup ? "translate-y-0" : "translate-y-full"
+        } h-3/4 overflow-y-auto`}
+      >
+        {productsForBuilding &&
+          productsForBuilding.map((product) => (
+            <div
+              key={product._id}
+              className="flex items-center gap-3 border border-black mb-1"
+            >
+              <div className="">
+                <Image
+                  src={`/img/product/${product.img}`}
+                  width={40}
+                  height={40}
+                  alt="product"
+                />
               </div>
-            ))}
-        </div>
+              <span> = </span>
+              <div className="">
+                {product.needs.map((productNeed) => (
+                  <div key={productNeed._id} className="flex items-center">
+                    <Image
+                      src={`/img/crops/${productNeed.crop.img}`}
+                      width={40}
+                      height={40}
+                      alt="product"
+                    />
+                    x {productNeed.amount}
+                  </div>
+                ))}
+              </div>
+              <span> + </span>
+              <div className="">{product.tapsToProduce} Тапів</div>
+              <div
+                className="bg-green-400 text-black text-sm p-1 rounded-lg"
+                onClick={() => {
+                  chooseProductToProduce(data.user.id, product._id),
+                    setBuildingPopup(false);
+                }}
+              >
+                Виготовити
+              </div>
+            </div>
+          ))}
+      </div>
     </div>
   );
 };

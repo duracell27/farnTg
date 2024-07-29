@@ -23,7 +23,7 @@ export const useFields = create((set) => ({
         userId,
         cropId,
         fieldId,
-        type
+        type,
       });
     } catch (error) {
       console.error("Failed to fetch user fields:", error);
@@ -35,7 +35,7 @@ export const useFields = create((set) => ({
         userId,
         cropId,
         fieldId,
-        type
+        type,
       });
     } catch (error) {
       console.error("Failed to fetch user fields:", error);
@@ -44,12 +44,14 @@ export const useFields = create((set) => ({
   updateField: async (fieldId, userId, amount) => {
     try {
       const response = await axios.put(`/api/fields/`, {
-        fieldId, userId, amount
+        fieldId,
+        userId,
+        amount,
       });
     } catch (error) {
       console.error("Failed to update field:", error);
     }
-  }
+  },
 }));
 // // Хранилище склада
 export const useWerehouse = create((set) => ({
@@ -67,7 +69,7 @@ export const useWerehouse = create((set) => ({
       console.error("Failed to fetch user werehouse:", error);
     }
   },
-}))
+}));
 
 // культури
 export const useCrops = create((set) => ({
@@ -99,6 +101,36 @@ export const useProductionBuildings = create((set) => ({
       console.error("Failed to fetch user fields:", error);
     }
   },
+  updateSlotTaps: async (userId, index) => {
+    console.log("Updating")
+    try {
+      const response = await axios.put("/api/production/forbuilding", {
+        userId,
+        index,
+      });
+      if (response.status === 200) {
+        const getUserBuildings = useProductionBuildings.getState().getUserBuildings;
+        getUserBuildings(userId);
+      }
+    } catch (error) {
+      console.error("Failed to fetch user fields:", error);
+    }
+  },
+
+  chooseProductToProduce: async (userId, productId) => {
+    try {
+      const response = await axios.post("/api/production/forbuilding", {
+        userId,
+        productId,
+      });
+      if (response.status === 200) {
+        const getUserBuildings = useProductionBuildings.getState().getUserBuildings;
+        getUserBuildings(userId);
+      }
+    } catch (error) {
+      console.error("Failed to fetch user fields:", error);
+    }
+  },
   getUserBuildings: async (userId) => {
     try {
       const response = await axios.get("/api/production", {
@@ -123,13 +155,14 @@ export const useProductionBuildings = create((set) => ({
       console.error("Failed to fetch user fields:", error);
     }
   },
-  buildBuilding: async (userId,type) => {
+  buildBuilding: async (userId, type) => {
     try {
       const response = await axios.post("/api/production", {
-        userId, type
+        userId,
+        type,
       });
       if (response.status === 200) {
-        set({ message: 'Успішно побудовано' });
+        set({ message: "Успішно побудовано" });
       }
     } catch (error) {
       console.error("Failed to fetch user fields:", error);

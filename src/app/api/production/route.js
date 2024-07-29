@@ -41,7 +41,7 @@ export const GET = async (req) => {
   try {
     await connect();
 
-    const buildings = await Production.find({ userId }).select('building');
+    const buildings = await Production.find({ userId }).select('building').populate('building.slots.product');
 
 
     return new Response(JSON.stringify(buildings), { status: 200 });

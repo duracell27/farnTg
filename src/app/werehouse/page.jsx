@@ -21,7 +21,7 @@ const Werehouse = () => {
         <h1 className="text-black text-center">Амбар</h1>
         {silo &&
           silo.map((item) => (
-            <div key={item.id} className="mb-3 text-black flex items-center gap-3">
+            <div key={item._id} className="mb-3 text-black flex items-center gap-3">
               <div className="">
                   <Image src={`/img/crops/${item.crop.img}`} width={60} height={60} alt="Crop" />
                 </div>

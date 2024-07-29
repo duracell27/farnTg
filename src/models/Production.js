@@ -13,10 +13,20 @@ const ProductionSchema = new Schema(
         required: true,
       },
       img: { type: String, required: true },
-      slots: [{type: Schema.Types.ObjectId, ref: "Product"}],
-      type: {type: String,  enum: ['bakery', 'FeedMill'], required: true},
-      price: { type: Number, required: true},
-      lvl: {type: Number, required: true}
+      slots: [
+        {
+          product: { type: Schema.Types.ObjectId, ref: "Product" },
+          tapsOnProduct: { type: Number, required: true, default: 0 },
+          slotStatus: {
+            type: String,
+            enum: ["empty", "production", "ready"],
+            required: true,
+          },
+        },
+      ],
+      type: { type: String, enum: ["bakery", "FeedMill"], required: true },
+      price: { type: Number, required: true },
+      lvl: { type: Number, required: true },
     },
   },
   {
