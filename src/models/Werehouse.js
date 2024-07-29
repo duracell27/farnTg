@@ -1,9 +1,21 @@
 import mongoose, { Schema } from "mongoose";
 
-const werehouseObjSchema = new Schema({
+const werehouseSiloSchema = new Schema({
   crop: {
     type: Schema.Types.ObjectId,
     ref: "Crop",
+    default: null,
+  },
+  amount: {
+    type: Number,
+    default: 0,
+  },
+});
+
+const werehouseWerehouseSchema = new Schema({
+  product: {
+    type: Schema.Types.ObjectId,
+    ref: "Product",
     default: null,
   },
   amount: {
@@ -19,7 +31,8 @@ const werehouseSchema = new Schema(
       ref: "User",
       required: true,
     },
-    silo: [werehouseObjSchema],
+    silo: [werehouseSiloSchema],
+    werehouse: [werehouseWerehouseSchema]
   },
   {
     timestamps: true,

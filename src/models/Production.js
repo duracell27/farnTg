@@ -15,7 +15,7 @@ const ProductionSchema = new Schema(
       img: { type: String, required: true },
       slots: [
         {
-          product: { type: Schema.Types.ObjectId, ref: "Product" },
+          product: { type: Schema.Types.ObjectId, ref: "Product", default: null },
           tapsOnProduct: { type: Number, required: true, default: 0 },
           slotStatus: {
             type: String,

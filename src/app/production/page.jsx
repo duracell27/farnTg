@@ -6,6 +6,8 @@ import React, { useEffect, useState } from "react";
 
 const Production = () => {
   const [buildingPopup, setBuildingPopup] = useState(false);
+  const [activeBuilding, setActiveBuilding] = useState(null);
+  const [activeBuildingSlot, setActiveBuildingSlot] = useState(null);
   const { data } = useSession();
 
   const buildings = useProductionBuildings((state) => state.buildings);
@@ -28,6 +30,7 @@ const Production = () => {
   const updateSlotTaps = useProductionBuildings(
     (state) => state.updateSlotTaps
   );
+  const collectProductToWerehouse = useProductionBuildings(state=>state.collectProductToWerehouse)
 
   useEffect(() => {
     if (data) {
@@ -94,15 +97,17 @@ const Production = () => {
                 </p>
                 {/* <p>Виробити: </p> */}
 
-                {building.building.slots.length > 0 &&
+                {building.building.slots &&
                   building.building.slots.map((slot, index) => {
-                    {
-                      slot.slotStatus === "emty" && (
+                    if (slot.slotStatus === "empty") {
+                      return (
                         <div className="size-16 bg-[#ca803f] flex justify-center items-center">
                           <span
                             onClick={() => {
                               setBuildingPopup(true);
                               getProductsForBuilding(building.building.type);
+                              setActiveBuilding(building._id);
+                              setActiveBuildingSlot(index);
                             }}
                             className="text-2xl p-10 cursor-pointer"
                           >
@@ -110,10 +115,8 @@ const Production = () => {
                           </span>
                         </div>
                       );
-                    }
-
-                    {
-                      slot.slotStatus === "production" && (
+                    } else if (slot.slotStatus === "production") {
+                      return (
                         <div className="flex gap-3 items-center w-full">
                           <Image
                             src={`/img/product/${slot.product.img}`}
@@ -125,17 +128,15 @@ const Production = () => {
                             {slot.tapsOnProduct} / {slot.product.tapsToProduce}
                           </span>
                           <button
-                            onClick={() => updateSlotTaps(data.user.id, index)}
+                            onClick={() => updateSlotTaps(building._id, index, data.user.id)}
                             className="p-5 bg-green-400 grow mr-2 rounded-xl"
                           >
                             Виробляти
                           </button>
                         </div>
                       );
-                    }
-
-                    {
-                      slot.slotStatus === "ready" && (
+                    } else if (slot.slotStatus === "ready") {
+                      return (
                         <div className="flex gap-3 items-center w-full">
                           <Image
                             src={`/img/product/${slot.product.img}`}
@@ -146,39 +147,13 @@ const Production = () => {
                           <span className="bg-green-400 text-black px-1 rounded-lg">
                             {slot.tapsOnProduct} / {slot.product.tapsToProduce}
                           </span>
-                          <button
-                            className="p-5 bg-green-400 grow mr-2 rounded-xl"
-                          >
+                          <button onClick={()=>collectProductToWerehouse(building._id, slot.product._id, index, 1, data.user.id)} className="p-5 bg-green-400 grow mr-2 rounded-xl">
                             Відправити на склад
                           </button>
                         </div>
                       );
                     }
-
-
                   })}
-
-                {/* {building.building.slots.length &&
-                  building.building.slots.map((product, index) => (
-                    <div className="flex gap-3 items-center w-full">
-                      <Image
-                        src={`/img/product/${product.product.img}`}
-                        width={60}
-                        height={60}
-                        alt="production"
-                      />
-                      <span className="bg-green-400 text-black px-1 rounded-lg">
-                        {product.tapsOnProduct} /{" "}
-                        {product.product.tapsToProduce}
-                      </span>
-                      <button
-                        onClick={() => updateSlotTaps(data.user.id, index)}
-                        className="p-5 bg-green-400 grow mr-2 rounded-xl"
-                      >
-                        Виробляти
-                      </button>
-                    </div>
-                  ))} */}
               </div>
             </div>
           ))}
@@ -189,6 +164,8 @@ const Production = () => {
           className="fixed inset-0 bg-black bg-opacity-50"
           onClick={() => {
             setBuildingPopup(false);
+            setActiveBuilding(null);
+            setActiveBuildingSlot(null);
           }}
         ></div>
       )}
@@ -232,8 +209,10 @@ const Production = () => {
               <div
                 className="bg-green-400 text-black text-sm p-1 rounded-lg"
                 onClick={() => {
-                  chooseProductToProduce(data.user.id, product._id),
-                    setBuildingPopup(false);
+                  chooseProductToProduce(data.user.id, product._id, activeBuilding, activeBuildingSlot),
+                  setBuildingPopup(false);
+                  setActiveBuilding(null);
+                  setActiveBuildingSlot(null);
                 }}
               >
                 Виготовити

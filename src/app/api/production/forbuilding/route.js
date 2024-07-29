@@ -6,6 +6,7 @@ import connect from "@/utils/db";
 export const GET = async (req) => {
   const url = new URL(req.url);
   const type = url.searchParams.get("type");
+  
 
   try {
     await connect();
@@ -23,13 +24,21 @@ export const GET = async (req) => {
 
 export const POST = async (req) => {
   const body = await req.json();
-  const { userId, productId } = body;
+  const { userId, productId, productionId,slotIndex } = body;
+
+  console.log('production id',productionId )
+  console.log('slot index',slotIndex )
 
   try {
     await connect();
 
-   await Production.findOneAndUpdate({ userId }, {$push: {'building.slots': {product: productId, tapsOnProduct:0, slotStatus: 'production'}}});
-    
+   const userProduction =  await Production.findOne({ _id: productionId })
+
+//    console.log('from build',userProduction)
+    // // {$push: {'building.slots': {product: productId, tapsOnProduct:0, slotStatus: 'production'}}});
+    userProduction.building.slots[slotIndex] = {product: productId, tapsOnProduct:0, slotStatus: 'production'}
+
+    await userProduction.save();
 
 
     return new Response(
@@ -45,18 +54,22 @@ export const POST = async (req) => {
 
 export const PUT = async (req) => {
   const body = await req.json();
-  const { userId, index } = body;
+  const { productionId, index } = body;
 
   try {
     await connect();
 
-   const productionObj = await Production.findOne({ userId }).populate('building.slots.product');
+   const productionObj = await Production.findOne({ _id: productionId }).populate('building.slots.product');
    const completedAmountTaps = productionObj.building.slots[index].product.tapsToProduce
 
+   console.log('completed amount taps',completedAmountTaps)
+   console.log('total amount taps',productionObj.building.slots[index].tapsOnProduct)
+
    if(productionObj.building.slots[index].tapsOnProduct+1 < completedAmountTaps){
-     productionObj.building.slots[index].tapsOnProduct+1;
+     productionObj.building.slots[index].tapsOnProduct+=1;
 
    }else{
+    productionObj.building.slots[index].tapsOnProduct+=1;
      productionObj.building.slots[index].slotStatus ='ready';
    }
 

@@ -7,11 +7,11 @@ import React, { useEffect } from "react";
 const Werehouse = () => {
   const { data } = useSession();
   const silo = useWerehouse((state) => state.silo);
-  const getUserSilo = useWerehouse((state) => state.getUserSilo);
+  const getUserWerehouse = useWerehouse((state) => state.getUserWerehouse);
 
   useEffect(() => {
     if (data) {
-      getUserSilo(data.user.id);
+      getUserWerehouse(data.user.id);
     }
   }, [data?.user?.id]);
 

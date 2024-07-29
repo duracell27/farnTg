@@ -21,7 +21,7 @@ export const POST = async (req) => {
 
     const userField = new Field({userId: newUser._id, fields: [firstField]});
     await userField.save();
-    const userWerehouse = new Werehouse({userId: newUser._id, silo: []})
+    const userWerehouse = new Werehouse({userId: newUser._id, silo: [], werehouse: []})
     await userWerehouse.save();
 
     return new Response(

@@ -73,6 +73,7 @@ const handler = NextAuth({
           const userWerehouse = new Werehouse({
             userId: newUser._id,
             silo: [],
+            werehouse: []
           });
           await userWerehouse.save();
         }

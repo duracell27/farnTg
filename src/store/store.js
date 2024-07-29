@@ -56,14 +56,15 @@ export const useFields = create((set) => ({
 // // Хранилище склада
 export const useWerehouse = create((set) => ({
   silo: null,
-
-  getUserSilo: async (userId) => {
+  werehouse:null,
+  getUserWerehouse: async (userId) => {
     try {
       const response = await axios.get("/api/werehouse", {
         params: { userId },
       });
       if (response.status === 200) {
         set({ silo: response.data.silo });
+        set({ werehouse: response.data.werehouse });
       }
     } catch (error) {
       console.error("Failed to fetch user werehouse:", error);
@@ -101,15 +102,16 @@ export const useProductionBuildings = create((set) => ({
       console.error("Failed to fetch user fields:", error);
     }
   },
-  updateSlotTaps: async (userId, index) => {
-    console.log("Updating")
+  updateSlotTaps: async (productionId, index, userId) => {
+    console.log("Updating");
     try {
       const response = await axios.put("/api/production/forbuilding", {
-        userId,
+        productionId,
         index,
       });
       if (response.status === 200) {
-        const getUserBuildings = useProductionBuildings.getState().getUserBuildings;
+        const getUserBuildings =
+          useProductionBuildings.getState().getUserBuildings;
         getUserBuildings(userId);
       }
     } catch (error) {
@@ -117,14 +119,23 @@ export const useProductionBuildings = create((set) => ({
     }
   },
 
-  chooseProductToProduce: async (userId, productId) => {
+  chooseProductToProduce: async (
+    userId,
+    productId,
+    productionId,
+    slotIndex
+  ) => {
+    
     try {
       const response = await axios.post("/api/production/forbuilding", {
         userId,
         productId,
+        productionId,
+        slotIndex,
       });
       if (response.status === 200) {
-        const getUserBuildings = useProductionBuildings.getState().getUserBuildings;
+        const getUserBuildings =
+          useProductionBuildings.getState().getUserBuildings;
         getUserBuildings(userId);
       }
     } catch (error) {
@@ -162,7 +173,28 @@ export const useProductionBuildings = create((set) => ({
         type,
       });
       if (response.status === 200) {
-        set({ message: "Успішно побудовано" });
+        const getUserBuildings =
+          useProductionBuildings.getState().getUserBuildings;
+        getUserBuildings(userId);
+      }
+    } catch (error) {
+      console.error("Failed to fetch user fields:", error);
+    }
+  },
+  collectProductToWerehouse: async (productionId, productId, slotId, amount,userId) => {
+    console.log('1')
+    try {
+      const response = await axios.put("/api/production", {
+        productionId,
+        productId,
+        slotId,
+        amount,
+        userId
+      });
+      if (response.status === 200) {
+        const getUserBuildings =
+          useProductionBuildings.getState().getUserBuildings;
+        getUserBuildings(userId);
       }
     } catch (error) {
       console.error("Failed to fetch user fields:", error);
